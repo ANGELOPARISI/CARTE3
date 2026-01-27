@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarocchi di Marsiglia - Metodo Tradizionale</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+        :root {
+            --primary: #F49F2C; /* Ambra principale */
+            --bg-dark: #5D3A1A; /* Marrone dorato più chiaro per contrasto */
+            --text-light: #f5e9d3;
+            --terra-light: #FCD6A7; /* Terra chiaro per pulsanti */
+            --amber-warm: #FDBB6D; /* Ambra più luminosa */
+            --amber-dark: #5D3A1A; /* Sfondo scuro alleggerito */
+            --glow-soft: rgba(253, 187, 109, 0.3);
+            
+            /* Dimensioni carte responsive e robuste per Desktop */
+            --card-w: clamp(90px, 9.5vmin, 140px);
+            --card-h: calc(var(--card-w) * 1.86);
+            --gap: clamp(8px, 1.2vmin, 14px);
+        }
+
+        /* Override per Mobile: riduce la dimensione base permettendo allo zoom di scendere ulteriormente */
+        @media (max-width: 768px) {
+            :root {
+                --card-w: clamp(60px, 15vw, 85px);
+                --card-h: calc(var(--card-w) * 1.86);
+                --gap: 6px;
+            }
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            background-color: var(--amber-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(circle at center, var(--amber-warm) 0%, var(--amber-dark) 95%);
+        }
+
+        #root {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .app-container, .daily-view, .admin-view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            box-sizing: border-box;
+            position: relative;
+            background: transparent;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5), 0 0 20px rgba(253, 187, 109, 0.4);
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+        }
+
+        /* Pulsanti Globali */
+        button, .zoom-btn, .info-icon-btn, .draw-icon-btn, .action-btn {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            font-style: italic;
+            border: 2px solid var(--amber-warm);
+            background-color: var(--terra-light);
+            color: var(--amber-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px var(--glow-soft);
+            border-radius: 4px;
+            text-transform: uppercase;
+            box-sizing: border-box;
+            font-weight: 700;
+        }
+
+        button:hover, .zoom-btn:hover, .info-icon-btn:hover, .draw-icon-btn:hover, .action-btn:hover {
+            background-color: var(--amber-warm);
+            color: var(--text-light);
+            box-shadow: 0 0 20px rgba(253, 187, 109, 0.6);
+            transform: translateY(-1px);
+        }
+        
+        button:disabled, .action-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            filter: grayscale(0.5);
+        }
+
+        .name-input, .date-input, .start-button, .daily-button {
+            width: 260px !important;
+            height: 52px !important;
+            box-sizing: border-box !important;
+            margin: 5px !important;
+        }
+
+        .start-button, .daily-button {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 1px;
+        }
+
+        .start-button { margin-top: 15px !important; }
+        .daily-button { margin-top: 5px !important; font-size: 0.95rem !important; }
+
+        .input-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .date-input, .name-input, .question-input, .admin-input {
+            font-family: 'Century Gothic', sans-serif;
+            font-size: 1.1rem;
+            font-style: italic;
+            background-color: rgba(93, 58, 26, 0.7);
+            border: 2px solid var(--amber-warm);
+            border-radius: 4px;
+            color: var(--text-light);
+            text-align: center;
+            outline: none;
+            box-shadow: 0 0 10px rgba(253, 187, 109, 0.1);
+            box-sizing: border-box;
+            margin: 5px;
+        }
+
+        .header-reading {
+            position: fixed;
+            top: 20px;
+            width: 100%;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .question-display {
+            font-size: 1.1rem;
+            font-style: italic;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            max-width: 90%;
+            margin: 0 auto;
+            background-color: rgba(93, 58, 26, 0.85);
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--amber-warm);
+            display: inline-block;
+            color: var(--text-light);
+        }
+        
+        .bottom-left-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 100;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 8px; 
+            align-items: center;
+            background-color: rgba(93, 58, 26, 0.85);
+            padding: 8px;
+            border-radius: 40px;
+            border: 1px solid var(--amber-warm);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .info-toggle-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 105;
+            display: flex;
+            flex-direction: row; 
+            align-items: center;
+            gap: 15px;
+            padding: 8px 15px;
+            background-color: rgba(93, 58, 26, 0.8);
+            border-radius: 40px;
+            border: 1px solid var(--amber-warm);
+        }
+
+        .info-tooltip {
+            position: absolute;
+            bottom: 65px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background-color: var(--amber-dark);
+            border: 1px solid var(--amber-warm);
+            color: var(--text-light);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .info-tooltip.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .spread-viewport {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: auto;
+            cursor: grab;
+        }
+
+        /* Layout Card robusto con CSS Variables */
+        .card {
+            position: absolute;
+            width: var(--card-w);
+            height: var(--card-h);
+            perspective: 1200px;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease;
+            opacity: 0;
+            /* Scala base ridotta per l'animazione di ingresso */
+            transform: scale(0.7); 
+            cursor: pointer;
+        }
+        
+        .card.is-visible {
+            opacity: 1;
+            /* La carta torna a scala 1 (relativa alle var CSS) quando entra in gioco */
+            transform: scale(1);
+        }
+
+        /* Supporto esplicito per la classe is-dealt se aggiunta in futuro */
+        .card.is-dealt {
+            transform: scale(1);
+        }
+
+        .card.is-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 8px;
+            background-color: #fff;
+            border: 1px solid #000;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-back {
+            z-index: 2;
+            transform: rotateY(0deg);
+            padding: 4px;
+        }
+
+        .backImageWrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+
+        .card-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card-front {
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+
+        .card-front img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: url(#tarot-correct);
+            display: block;
+        }
+
+        .is-inverted .card-front img {
+            transform: rotate(180deg);
+        }
+
+        .card-label {
+            position: absolute;
+            bottom: -32px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--terra-light);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+            pointer-events: none;
+        }
+
+        .minor-card {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            bottom: -10%;
+            right: -10%;
+            z-index: 30;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+            perspective: 1000px;
+        }
+
+        .minor-card.enlarged {
+            width: 100%;
+            height: 100%;
+            bottom: 50%;
+            right: 50%;
+            transform: translate(50%, 50%) scale(1.5);
+            z-index: 200;
+        }
+
+        .corner-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .daily-card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            max-width: var(--card-w);
+            max-height: 85vh;
+            margin: auto;
+            z-index: 10;
+        }
+
+        .daily-card-img {
+            max-width: 100%;
+            max-height: 55vh;
+            border-radius: 10px;
+            border: 3px solid var(--amber-warm);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            background-color: rgba(93, 58, 26, 0.4);
+        }
+
+        .daily-phrase {
+            font-size: 1.15rem;
+            color: var(--text-light);
+            max-width: 420px;
+            text-align: center;
+            font-style: italic;
+            line-height: 1.4;
+            background: rgba(93, 58, 26, 0.85);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--amber-warm);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            margin-top: 5px;
+        }
+
+        .admin-panel {
+            width: 95%;
+            max-width: 700px;
+            height: 70vh;
+            background: rgba(93, 58, 26, 0.9);
+            border: 2px solid var(--amber-warm);
+            border-radius: 12px;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        @media (max-width: 600px) {
+            .daily-card-img { max-height: 45vh; }
+            .corner-controls, .bottom-left-controls, .info-toggle-container { bottom: 20px; }
+            .info-icon-btn, .draw-icon-btn { width: 40px; height: 40px; }
+            .name-input, .date-input, .start-button, .daily-button { width: 240px !important; }
+        }
+
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body>
+    <svg style="width:0;height:0;position:absolute;" aria-hidden="true">
+        <defs>
+            <filter id="tarot-correct">
+                <feColorMatrix type="matrix" values="
+                    1     0     0     0     0
+                    0.3   1.0   -0.3  0     0
+                    0.15  0.15  0.7   0     0
+                    0     0     0     1     0
+                "/>
+            </filter>
+        </defs>
+    </svg>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
