@@ -310,6 +310,7 @@ const App = () => {
     const [flippedCardIds, setFlippedCardIds] = useState<Set<number>>(new Set());
     const [visibleCardIds, setVisibleCardIds] = useState<Set<number>>(new Set());
     const [isInteracting, setIsInteracting] = useState(false);
+    const [isStoppedManually, setIsStoppedManually] = useState(false);
     const [question, setQuestion] = useState("");
     const [consultantName, setConsultantName] = useState("");
     const [readingDate, setReadingDate] = useState(getTodayDate());
@@ -394,6 +395,7 @@ const App = () => {
     const handleStartReading = useCallback(() => {
         if (isInteracting) return;
         setIsInteracting(true);
+        setIsStoppedManually(false);
         clearAllTimers();
         setFlippedCardIds(new Set());
         setVisibleCardIds(new Set());
@@ -459,7 +461,7 @@ const App = () => {
     }, [isInteracting, clearAllTimers]);
 
     const handleDrawNextCard = useCallback(() => {
-        if (isInteracting || !reading || reading.isComplete) return;
+        if (isInteracting || !reading || reading.isComplete || isStoppedManually) return;
         setIsInteracting(true);
         const newState = dealNextCard(reading);
         setReading(newState);
@@ -476,7 +478,18 @@ const App = () => {
         }, FLIP_OFFSET_MS);
         
         animationTimers.current.push(tVisible, tFlip);
-    }, [isInteracting, reading]);
+    }, [isInteracting, reading, isStoppedManually]);
+
+    const handleManualStop = useCallback(() => {
+        if (!reading) return;
+        clearAllTimers();
+        setIsStoppedManually(true);
+        setIsInteracting(false);
+        setReading(prev => {
+            if (!prev) return prev;
+            return { ...prev, isComplete: true };
+        });
+    }, [reading, clearAllTimers]);
 
     const handleReset = () => {
         clearAllTimers();
@@ -484,6 +497,7 @@ const App = () => {
         setFlippedCardIds(new Set());
         setVisibleCardIds(new Set());
         setIsInteracting(false);
+        setIsStoppedManually(false);
         setQuestion("");
         setConsultantName("");
         setReadingDate(getTodayDate());
@@ -675,7 +689,7 @@ const App = () => {
                         i
                     </button>
                     
-                    {!reading.isComplete && (
+                    {!reading.isComplete && !isStoppedManually && (
                         <button 
                             className="draw-icon-btn" 
                             onClick={handleDrawNextCard} 
@@ -689,10 +703,20 @@ const App = () => {
                             </svg>
                         </button>
                     )}
+
+                    {!reading.isComplete && (
+                        <button 
+                            className="draw-icon-btn stop-btn" 
+                            onClick={handleManualStop}
+                            title="Interrompi Stesura"
+                        >
+                            F
+                        </button>
+                    )}
                 </div>
 
                 <div className="corner-controls">
-                     {reading.isComplete && !isInteracting && (
+                     {(reading.isComplete || isStoppedManually) && !isInteracting && (
                          <button className="action-btn completion-btn-final" onClick={handleReset}>FINE</button>
                     )}
                 </div>

@@ -110,6 +110,29 @@
             filter: grayscale(0.5);
         }
 
+        /* Icone Quadrate Uniformi (Zoom, Info, Stop, Draw) */
+        .zoom-btn, .info-icon-btn, .draw-icon-btn, .stop-btn {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            font-size: 1.1rem !important;
+            border-radius: 4px !important; /* Forma quadrata con angoli arrotondati */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 2px solid var(--amber-warm) !important;
+            background-color: var(--terra-light) !important;
+            color: var(--amber-dark) !important;
+            padding: 0 !important;
+            box-shadow: 0 2px 5px var(--glow-soft) !important;
+        }
+
+        .draw-icon-btn svg {
+            width: 16px !important;
+            height: 24px !important;
+        }
+
         .name-input, .date-input, .start-button, .daily-button {
             width: 260px !important;
             height: 52px !important;
@@ -190,8 +213,8 @@
             gap: 8px; 
             align-items: center;
             background-color: rgba(93, 58, 26, 0.85);
-            padding: 8px;
-            border-radius: 40px;
+            padding: 6px;
+            border-radius: 8px;
             border: 1px solid var(--amber-warm);
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
@@ -205,10 +228,10 @@
             display: flex;
             flex-direction: row; 
             align-items: center;
-            gap: 15px;
-            padding: 8px 15px;
+            gap: 8px;
+            padding: 6px 12px;
             background-color: rgba(93, 58, 26, 0.8);
-            border-radius: 40px;
+            border-radius: 8px;
             border: 1px solid var(--amber-warm);
         }
 
@@ -259,11 +282,6 @@
         .card.is-visible {
             opacity: 1;
             /* La carta torna a scala 1 (relativa alle var CSS) quando entra in gioco */
-            transform: scale(1);
-        }
-
-        /* Supporto esplicito per la classe is-dealt se aggiunta in futuro */
-        .card.is-dealt {
             transform: scale(1);
         }
 
@@ -430,7 +448,6 @@
         @media (max-width: 600px) {
             .daily-card-img { max-height: 45vh; }
             .corner-controls, .bottom-left-controls, .info-toggle-container { bottom: 20px; }
-            .info-icon-btn, .draw-icon-btn { width: 40px; height: 40px; }
             .name-input, .date-input, .start-button, .daily-button { width: 240px !important; }
         }
 
