@@ -42,7 +42,7 @@ const DEFAULT_PHRASES = [
     "Non temere le ombre; l'intuizione illumina l'inconscio.",
     "Il successo e la gioia risplendono sul tuo cammino.",
     "Risvegliati a una nuova consapevolezza e rispondi alla chiamata.",
-    "Hai raggiunto la completezza; goditi il trionfo e la realizzazione."
+    "Hai raggiungimento la completezza; goditi il trionfo e la realizzazione."
 ];
 
 type GazeDir = 'left' | 'right' | 'front';
@@ -814,7 +814,7 @@ const App = () => {
         <div className="app-container">
             <h1>Tarocchi di Marsiglia</h1>
             
-            <div className="input-group">
+            <div className="home-top-row">
                 <input 
                     type="text" 
                     className="name-input"
@@ -828,23 +828,27 @@ const App = () => {
                     value={readingDate}
                     onChange={(e) => setReadingDate(e.target.value)}
                 />
+            </div>
+
+            <div className="home-main-column">
                 <input 
                     type="text" 
                     className="question-input"
-                    placeholder="Scrivi qui la tua domanda..."
+                    placeholder="SCRIVI QUI LA TUA DOMANDA..."
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                 />
+
+                <button className="start-button" onClick={handleStartReading} disabled={isInteracting}>
+                    Inizia Lettura
+                </button>
+                <button className="daily-button" onClick={handleDailyCardClick}>
+                    Carta del Giorno
+                </button>
             </div>
 
-            <button className="start-button" onClick={handleStartReading} disabled={isInteracting}>
-                Inizia Lettura
-            </button>
-            <button className="daily-button" onClick={handleDailyCardClick}>
-                Carta del Giorno
-            </button>
             <button className="admin-toggle-btn" onClick={handleAdminClick}>
-                Admin
+                A
             </button>
         </div>
     );
