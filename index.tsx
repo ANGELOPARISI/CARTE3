@@ -834,7 +834,7 @@ const App = () => {
                 <input 
                     type="text" 
                     className="question-input"
-                    placeholder="SCRIVI QUI LA TUA DOMANDA..."
+                    placeholder="LA TUA DOMANDA"
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                 />
